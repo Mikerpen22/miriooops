@@ -1,6 +1,6 @@
 +++
 title = "About"
-date = "2014-04-09"
+date = "2021-06-29"
 aliases = ["about-us","about-hugo","contact"]
 [ author ]
   name = "Hugo Authors"
@@ -12,3 +12,7 @@ I'm a physicist turned rogue into a programmer. Interested in learning about mac
 
 
 > The secrets of getting ahead is getting started - Mark Twain
+
+
+# CV
+{{< embed-pdf url="Newgrad_Resume_ver2.pdf" hidePaginator="true">}}
