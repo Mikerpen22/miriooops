@@ -1,7 +1,7 @@
 ---
 author:
   name: "Minhung Shih"
-date: 2021-03-29
+date: 2021-03-22
 linktitle: Setting GOPATH
 type:
 - post
