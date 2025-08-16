@@ -1,4 +1,4 @@
-baseURL = "https://mirilog.pages.dev/"
+baseURL = "https://mirilog.netlify.app/"
 title = "MiriLog"
 languageCode = "en-us"
 theme = "hello-friend-ng"
