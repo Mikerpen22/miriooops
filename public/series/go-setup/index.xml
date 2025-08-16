@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Go Setup on Miriooops</title>
+    <link>http://localhost:1313/series/go-setup/</link>
+    <description>Recent content in Go Setup on Miriooops</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+    <lastBuildDate>Mon, 22 Mar 2021 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/series/go-setup/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Setting GOPATH</title>
+      <link>http://localhost:1313/posts/2021/03/setting-gopath/</link>
+      <pubDate>Mon, 22 Mar 2021 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/2021/03/setting-gopath/</guid>
+      <description>&lt;h3 id=&#34;the-gopath-and-path-environment-variables&#34;&gt;The GOPATH and PATH environment variables&lt;/h3&gt;&#xA;&lt;p&gt;The &lt;code&gt;GOPATH&lt;/code&gt; environment variable specifies the location of your workspace. It defaults to a directory named &lt;code&gt;go&lt;/code&gt; inside your home directory (&lt;code&gt;$HOME/go&lt;/code&gt;).&lt;/p&gt;&#xA;&lt;p&gt;If you really want to change your GOPATH to something else add GOPATH to your shell/bash/zsh initialization file &lt;code&gt;.bash_profile&lt;/code&gt;, &lt;code&gt;.bashrc&lt;/code&gt; or &lt;code&gt;.zshrc&lt;/code&gt;.&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;export GOPATH=/something-else&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Add &lt;code&gt;GOPATH/bin&lt;/code&gt; directory to your &lt;code&gt;PATH&lt;/code&gt; environment variable so you can run Go programs anywhere.&lt;/p&gt;&#xA;&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;export PATH=$PATH:$(go env GOPATH)/bin&#xA;&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Make sure to re-source &lt;code&gt;source .bash_profile&lt;/code&gt; your current session or simply open new tab within iTerm.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

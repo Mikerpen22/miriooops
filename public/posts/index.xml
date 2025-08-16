@@ -1,0 +1,96 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Posts on Miriooops</title>
+        <link>http://localhost:1313/posts/</link>
+        <description>Recent content in Posts on Miriooops</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en</language>
+        <copyright>&lt;a href=&#34;https://creativecommons.org/licenses/by-nc/4.0/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;CC BY-NC 4.0&lt;/a&gt;</copyright>
+        <lastBuildDate>Fri, 20 May 2022 00:00:00 +0000</lastBuildDate>
+        <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Service mesh &amp; lstio</title>
+            <link>http://localhost:1313/posts/2022/05/service-mesh-lstio/</link>
+            <pubDate>Fri, 20 May 2022 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/2022/05/service-mesh-lstio/</guid>
+            <description>&lt;h3 id=&#34;whats-service-mesh&#34;&gt;What&amp;rsquo;s service mesh&lt;/h3&gt;
+&lt;p&gt;A service mesh, like the open source project &lt;a href=&#34;https://www.redhat.com/en/topics/microservices/what-is-istio&#34;&gt;Istio,&lt;/a&gt; &lt;em&gt;is a way to control how different parts of an application share data with one another&lt;/em&gt;. Unlike other systems for managing this communication, a service mesh is a dedicated infrastructure layer built right into an app&lt;/p&gt;
+&lt;h3 id=&#34;how-it-works&#34;&gt;How it works&lt;/h3&gt;
+&lt;p&gt;A &lt;strong&gt;service mesh doesn’t introduce new functionality to an app’s runtime environment&lt;/strong&gt; — apps in any architecture have always needed rules to specify how requests get from point A to point B. What’s different about a service mesh is that it takes the logic governing service-to-service communication out of individual services and abstracts it to a layer of infrastructure.&lt;/p&gt;</description>
+            <content type="html"><![CDATA[<h3 id="whats-service-mesh">What&rsquo;s service mesh</h3>
+<p>A service mesh, like the open source project <a href="https://www.redhat.com/en/topics/microservices/what-is-istio">Istio,</a> <em>is a way to control how different parts of an application share data with one another</em>. Unlike other systems for managing this communication, a service mesh is a dedicated infrastructure layer built right into an app</p>
+<h3 id="how-it-works">How it works</h3>
+<p>A <strong>service mesh doesn’t introduce new functionality to an app’s runtime environment</strong> — apps in any architecture have always needed rules to specify how requests get from point A to point B. What’s different about a service mesh is that it takes the logic governing service-to-service communication out of individual services and abstracts it to a layer of infrastructure.</p>
+<blockquote>
+<p><strong>To do this, a service mesh is built into an app as an array of network proxies.</strong>  Proxies are a familiar concept in enterprise IT.</p></blockquote>
+<p>In a service mesh, requests are routed between microservices through proxies in their own infrastructure layer. For this reason, <strong>individual proxies that make up a service mesh are sometimes called &ldquo;sidecars&rdquo;</strong>, since they run <em>alongside</em> each service, rather than <em>within</em> them. Taken together, these &ldquo;sidecar&rdquo; proxies—decoupled from each service—form a mesh network.</p>
+<p>
+    <img src="/images/service-mesh.png"  alt="Hello Friend"  class="center"  style="border-radius: 8px;"  />
+
+
+
+    <img src="/images/k8s-network-service-mesh.png"  alt="Hello Friend"  class="center"  style="border-radius: 8px;"  />
+
+</p>
+<h3 id="why-service-mesh---lstio">Why Service mesh -&gt; lstio</h3>
+<ul>
+<li>Starting with a question:
+Kubernetes defines the final state of the service and enables the system to reach and stay in that state automatically. <em>So how do you manage the traffic on the service after the application has been deployed?</em></li>
+<li>There are limitations with K8s
+K8s is used as a tool for intensive resource management. <strong>However</strong>, after allocating resources to the application,K8s doesn’t fully solve the problems of how to ensure the robustness and redundancy of the application, how to achieve finer-grained traffic division (not based on the number of instances of the service), how to guarantee the security of the service, or how to manage multiple clusters, etc.</li>
+</ul>
+<h3 id="lstio-101">lstio 101</h3>
+<p>
+    <img src="/images/lstio-architecture.jpeg"  alt="Hello Friend"  class="center"  style="border-radius: 8px;"  />
+
+
+From the diagram we can see that:</p>
+<ul>
+<li><code>Istiod</code> acts as the control plane, <em>distributing the configuration to all sidecar proxies and gateways</em>. (Note: for simplification, the connections between Istiod and sidecar are not drawn in the diagram.)</li>
+<li><em>Istio enables intelligent application-aware load balancing from the application layer to other mesh enabled services in the cluster, and bypasses the rudimentary kube-proxy load balancing.</em></li>
+<li><strong>Application administrators can manipulate the behavior of traffic in the <a href="https://thenewstack.io/why-do-you-need-istio-when-you-already-have-kubernetes/">Istio service mesh</a> through a declarative API, in the same way they manage workloads in Kubernetes. It can take effects within seconds and they can do this without needing to redeploy.</strong></li>
+<li>Ingress is replaced by Gateway resources, a special kind of proxy that is also a reused Sidecar proxy.</li>
+<li>A sidecar proxy can be installed in a virtual machine to bring the virtual machine into the Istio mesh.</li>
+</ul>
+
+    <img src="/images/istiod.png"  alt="Hello Friend"  class="center"  style="border-radius: 8px;"  />
+
+
+<h3 id="summary">Summary</h3>
+<ul>
+<li><strong>Service Mesh is the cloud native equivalent of TCP/IP</strong>, addressing application network communication, security and visibility issues.</li>
+<li>Istio is currently the most popular service mesh implementation, relying on Kubernetes but also scalable to virtual machine loads.</li>
+<li>Istio’s core consists of a control plane and a data plane, with Envoy as the default data-plane agent.</li>
+<li>Istio acts as the network layer of the cloud native infrastructure and is transparent to applications.</li>
+</ul>
+]]></content>
+        </item>
+        
+        <item>
+            <title>Setting GOPATH</title>
+            <link>http://localhost:1313/posts/2021/03/setting-gopath/</link>
+            <pubDate>Mon, 22 Mar 2021 00:00:00 +0000</pubDate>
+            
+            <guid>http://localhost:1313/posts/2021/03/setting-gopath/</guid>
+            <description>&lt;h3 id=&#34;the-gopath-and-path-environment-variables&#34;&gt;The GOPATH and PATH environment variables&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;GOPATH&lt;/code&gt; environment variable specifies the location of your workspace. It defaults to a directory named &lt;code&gt;go&lt;/code&gt; inside your home directory (&lt;code&gt;$HOME/go&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;If you really want to change your GOPATH to something else add GOPATH to your shell/bash/zsh initialization file &lt;code&gt;.bash_profile&lt;/code&gt;, &lt;code&gt;.bashrc&lt;/code&gt; or &lt;code&gt;.zshrc&lt;/code&gt;.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;export GOPATH=/something-else
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Add &lt;code&gt;GOPATH/bin&lt;/code&gt; directory to your &lt;code&gt;PATH&lt;/code&gt; environment variable so you can run Go programs anywhere.&lt;/p&gt;
+&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;export PATH=$PATH:$(go env GOPATH)/bin
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Make sure to re-source &lt;code&gt;source .bash_profile&lt;/code&gt; your current session or simply open new tab within iTerm.&lt;/p&gt;</description>
+            <content type="html"><![CDATA[<h3 id="the-gopath-and-path-environment-variables">The GOPATH and PATH environment variables</h3>
+<p>The <code>GOPATH</code> environment variable specifies the location of your workspace. It defaults to a directory named <code>go</code> inside your home directory (<code>$HOME/go</code>).</p>
+<p>If you really want to change your GOPATH to something else add GOPATH to your shell/bash/zsh initialization file <code>.bash_profile</code>, <code>.bashrc</code> or <code>.zshrc</code>.</p>
+<pre tabindex="0"><code>export GOPATH=/something-else
+</code></pre><p>Add <code>GOPATH/bin</code> directory to your <code>PATH</code> environment variable so you can run Go programs anywhere.</p>
+<pre tabindex="0"><code>export PATH=$PATH:$(go env GOPATH)/bin
+</code></pre><p>Make sure to re-source <code>source .bash_profile</code> your current session or simply open new tab within iTerm.</p>
+<p>#go #path #setup</p>
+]]></content>
+        </item>
+        
+    </channel>
+</rss>
