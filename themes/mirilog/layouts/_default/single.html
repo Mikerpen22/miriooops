@@ -1,0 +1,84 @@
+{{ define "main" }}
+
+<article class="post">
+  <header class="post-header">
+    <h1 class="post-title">{{ .Title }}</h1>
+    <div class="post-meta">
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+      <span class="meta-sep">&middot;</span>
+      <span>{{ .ReadingTime }} min read</span>
+      {{ with .Params.tags }}
+      <span class="meta-sep">&middot;</span>
+      <span class="meta-tags">{{ range $i, $t := . }}{{ if $i }} {{ end }}#{{ $t }}{{ end }}</span>
+      {{ end }}
+    </div>
+  </header>
+
+  {{/* Table of Contents — only render if there are headings */}}
+  {{ $toc := .TableOfContents }}
+  {{ if and $toc (gt (len $toc) 100) }}
+  <aside class="toc-sidebar" id="toc">
+    <div class="toc-progress" aria-hidden="true"></div>
+    <nav class="toc-nav">
+      <p class="toc-title">on this page</p>
+      {{ $toc }}
+    </nav>
+  </aside>
+  {{ end }}
+
+  <div class="post-content">
+    {{ .Content }}
+  </div>
+
+  <footer class="post-footer">
+    {{ with .Params.tags }}
+    <div class="post-tags">
+      {{ range . }}
+      <a href="{{ "tags/" | absURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>
+      {{ end }}
+    </div>
+    {{ end }}
+    <a href="{{ "posts/" | absURL }}" class="back-link">&larr; cd ~/posts</a>
+  </footer>
+</article>
+
+{{ if and $toc (gt (len $toc) 100) }}
+<script>
+(function() {
+  // Scroll spy — highlight active heading in TOC
+  var headings = document.querySelectorAll('.post-content h2[id], .post-content h3[id], .post-content h4[id]');
+  var tocLinks = document.querySelectorAll('.toc-nav a');
+  if (!headings.length || !tocLinks.length) return;
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var id = entry.target.getAttribute('id');
+        tocLinks.forEach(function(a) { a.classList.remove('active'); });
+        var link = document.querySelector('.toc-nav a[href="#' + id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '0px 0px -75% 0px' });
+
+  headings.forEach(function(h) { observer.observe(h); });
+
+  // Reading progress bar
+  var content = document.querySelector('.post-content');
+  var toc = document.getElementById('toc');
+  if (!content || !toc) return;
+
+  function updateProgress() {
+    var rect = content.getBoundingClientRect();
+    var total = rect.height - window.innerHeight;
+    var progress = total > 0 ? Math.max(0, Math.min(1, -rect.top / total)) : 0;
+    toc.style.setProperty('--progress', progress);
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+})();
+</script>
+{{ end }}
+
+{{ end }}

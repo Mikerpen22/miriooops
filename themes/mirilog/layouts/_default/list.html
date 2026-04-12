@@ -1,0 +1,23 @@
+{{ define "main" }}
+
+<p class="section-label">~/{{ .Title | lower }}</p>
+
+{{ range .Pages }}
+<article class="post-item">
+  <div class="post-item-header">
+    <a href="{{ .Permalink }}" class="post-link">{{ .Title }}</a>
+    <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+  </div>
+  {{ with .Params.tags }}
+  <div class="post-tags">
+    {{ range . }}
+    <a href="{{ "tags/" | absURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>
+    {{ end }}
+  </div>
+  {{ end }}
+</article>
+{{ end }}
+
+{{ template "_internal/pagination.html" . }}
+
+{{ end }}

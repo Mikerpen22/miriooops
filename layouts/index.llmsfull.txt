@@ -1,0 +1,19 @@
+# {{ .Site.Title }}
+
+> {{ .Site.Params.description }}
+
+## Author
+
+{{ .Site.Params.author }} — {{ .Site.Params.bio }}
+{{ range where .Site.RegularPages "Section" "posts" }}
+
+---
+
+# {{ .Title }}
+
+- Date: {{ .Date.Format "2006-01-02" }}
+- URL: {{ .Permalink }}{{ with .Params.tags }}
+- Tags: {{ delimit . ", " }}{{ end }}
+
+{{ .RawContent }}
+{{- end }}

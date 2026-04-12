@@ -10,6 +10,9 @@ type:
 weight: 10
 series:
 - Infra
+tags:
+- kubernetes
+- networking
 aliases:
 ---
 

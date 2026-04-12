@@ -1,2 +1,11 @@
 /public
 /resources
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Claude Code
+CLAUDE.md
+.impeccable.md
+.claude/

@@ -1,0 +1,27 @@
+{{ define "main" }}
+
+{{ with .Site.Params.bio }}
+<div class="intro">
+  <p>{{ . | markdownify }}</p>
+</div>
+{{ end }}
+
+<p class="section-label">~/posts</p>
+
+{{ range where .Site.RegularPages "Section" "posts" }}
+<article class="post-item">
+  <div class="post-item-header">
+    <a href="{{ .Permalink }}" class="post-link">{{ .Title }}</a>
+    <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+  </div>
+  {{ with .Params.tags }}
+  <div class="post-tags">
+    {{ range . }}
+    <a href="{{ "tags/" | absURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>
+    {{ end }}
+  </div>
+  {{ end }}
+</article>
+{{ end }}
+
+{{ end }}

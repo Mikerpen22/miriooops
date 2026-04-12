@@ -1,0 +1,19 @@
+# {{ .Site.Title }}
+
+> {{ .Site.Params.description }}
+
+## Author
+
+{{ .Site.Params.author }} — {{ .Site.Params.bio }}
+
+## Links
+
+- [Posts]({{ "posts/" | absURL }})
+- [About]({{ "about/" | absURL }})
+- [RSS]({{ "index.xml" | absURL }})
+- [Full content for LLMs]({{ "llms-full.txt" | absURL }})
+
+## Posts
+{{ range where .Site.RegularPages "Section" "posts" }}
+- [{{ .Title }}]({{ .Permalink }}): {{ .Date.Format "2006-01-02" }}{{ with .Params.tags }} | Tags: {{ delimit . ", " }}{{ end }}
+{{- end }}

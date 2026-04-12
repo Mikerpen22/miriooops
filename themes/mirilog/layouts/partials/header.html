@@ -1,0 +1,8 @@
+<header class="site-header">
+  <a href="{{ "/" | relURL }}" class="site-name"><span class="prompt">&gt;</span> {{ .Site.Params.siteName | default .Site.Title }}</a>
+  <nav class="site-nav">
+    {{ range .Site.Menus.main }}
+      <a href="{{ .URL | relURL }}"{{ if $.IsMenuCurrent "main" . }} aria-current="page"{{ end }}>{{ .Name | lower }}</a>
+    {{ end }}
+  </nav>
+</header>

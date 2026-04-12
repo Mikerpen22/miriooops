@@ -1,0 +1,11 @@
+{{ define "main" }}
+
+<p class="section-label">~/tags</p>
+
+<div class="tags-list">
+  {{ range .Data.Terms.Alphabetical }}
+  <a href="{{ .Page.Permalink }}" class="tag">{{ .Page.Title }}<span class="tag-count">({{ .Count }})</span></a>
+  {{ end }}
+</div>
+
+{{ end }}

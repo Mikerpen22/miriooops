@@ -10,6 +10,8 @@ title: Setting GOPATH
 weight: 10
 series:
 - Go Setup
+tags:
+- go
 ---
 
 

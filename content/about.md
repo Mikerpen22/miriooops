@@ -6,7 +6,7 @@ aliases = ["about-us","about-hugo","contact"]
   name = "Hugo Authors"
 +++
 
-{{< embed-pdf url="Newgrad_Resume_ver2.pdf" hidePaginator="true">}}
+{{< embed-pdf url="resume.pdf" hidePaginator="true">}}
 
 I'm a physicist turned rogue into a programmer. Interested in machine learning, statistics, backend, and details behind how programs work. I mostly write about simple but slightly technical stuff for myself.
 

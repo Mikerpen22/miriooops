@@ -1,0 +1,7 @@
+<footer class="site-footer">
+  <span>&copy; {{ now.Year }} {{ .Site.Params.author | default .Site.Title }}</span>
+  <nav class="footer-links">
+    <a href="{{ "/index.xml" | relURL }}">rss</a>
+    <a href="{{ "llms.txt" | relURL }}">llms.txt</a>
+  </nav>
+</footer>
