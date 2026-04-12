@@ -39,18 +39,96 @@ The `mirilog` theme is a custom terminal-minimal theme built for this blog. It s
 - Responsive layout with fluid spacing
 - RSS feed + [llms.txt](https://llmstxt.org/) output
 
-## Content
+## Writing a new post
 
-Posts live in `content/posts/` as Markdown files. Front matter:
+### 1. Create the file
+
+```bash
+hugo new posts/my-post-title.md
+```
+
+This generates `content/posts/my-post-title.md` from the archetype with `draft: true` so it won't appear in production until you're ready.
+
+### 2. Edit the front matter
 
 ```yaml
 ---
-title: "Post Title"
-date: 2026-01-01
-draft: false
-tags: [tag1, tag2]
+title: "My Post Title"
+date: 2026-04-12
+draft: true
+tags: [kubernetes, networking]
 ---
 ```
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `title` | Yes | Displayed as the post title and in the browser tab |
+| `date` | Yes | ISO format (`YYYY-MM-DD`). Controls sort order on the home page |
+| `draft` | Yes | Set to `true` while writing, `false` to publish |
+| `tags` | No | Array of lowercase tags. Each tag gets a pill and its own `/tags/{name}/` page |
+
+### 3. Write content
+
+The blog supports full [GitHub Flavored Markdown](https://github.github.com/gfm/):
+
+```markdown
+## Headings generate the table of contents
+
+Body text in **bold**, *italic*, and ~~strikethrough~~.
+
+Inline `code` and fenced code blocks with syntax highlighting:
+
+​```go
+func main() {
+    fmt.Println("hello")
+}
+​```
+
+| Tables | work |
+|--------|------|
+| like   | this |
+
+- [x] Task lists
+- [ ] are supported
+
+Footnotes[^1] work too.
+
+[^1]: Like this one.
+```
+
+For images, place them in `static/images/` and reference them:
+
+```markdown
+![Alt text](/images/my-diagram.png)
+```
+
+Or use the image shortcode for positioning:
+
+```markdown
+{{</* image src="/images/my-diagram.png" alt="Description" */>}}
+```
+
+### 4. Preview locally
+
+```bash
+hugo server -D
+```
+
+Open `http://localhost:1313`. The `-D` flag includes drafts. Hugo live-reloads on save.
+
+Posts with 2+ headings will show a table of contents sidebar on wide screens (>1200px).
+
+### 5. Publish
+
+Set `draft: false` in the front matter, commit, and push:
+
+```bash
+git add content/posts/my-post-title.md
+git commit -m "feat: add post on my-post-title"
+git push
+```
+
+Netlify auto-deploys from `main`. The post will be live at `mirilog.netlify.app/posts/YYYY/MM/my-post-title/`.
 
 ## License
 
