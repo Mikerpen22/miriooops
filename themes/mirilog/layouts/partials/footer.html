@@ -1,7 +1,13 @@
 <footer class="site-footer">
-  <span>&copy; {{ now.Year }} {{ .Site.Params.author | default .Site.Title }}</span>
-  <nav class="footer-links">
-    <a href="{{ "/index.xml" | relURL }}">rss</a>
-    <a href="{{ "llms.txt" | relURL }}">llms.txt</a>
-  </nav>
+  <div class="footer-separator"></div>
+  <div class="footer-content">
+    <span>&copy; {{ now.Year }} {{ .Site.Params.author | default .Site.Title }}</span>
+    <nav class="footer-links">
+      <a href="{{ "/index.xml" | relURL }}">rss</a>
+      <a href="{{ "llms.txt" | relURL }}">llms.txt</a>
+    </nav>
+  </div>
+  <button class="back-to-top" aria-label="Back to top" type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    &uarr; top
+  </button>
 </footer>

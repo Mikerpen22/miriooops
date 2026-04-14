@@ -3,10 +3,14 @@
 <p class="section-label">~/{{ .Title | lower }}</p>
 
 {{ range .Pages }}
-<article class="post-item">
-  <div class="post-item-header">
-    <a href="{{ .Permalink }}" class="post-link">{{ .Title }}</a>
-    <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+<article class="post-card">
+  <div class="post-card-header">
+    <a href="{{ .Permalink }}" class="post-card-link">{{ .Title }}</a>
+    <div class="post-card-meta">
+      <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+      <span class="meta-sep">&middot;</span>
+      <span class="reading-time">{{ .ReadingTime }} min read</span>
+    </div>
   </div>
   {{ with .Params.tags }}
   <div class="post-tags">
