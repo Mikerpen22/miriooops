@@ -7,6 +7,10 @@
       <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
       <span class="meta-sep">&middot;</span>
       <span>{{ .ReadingTime }} min read</span>
+      {{ with .Params.lastmod }}
+      <span class="meta-sep">&middot;</span>
+      <span class="meta-updated">updated {{ . | time.Format "2006-01-02" }}</span>
+      {{ end }}
       {{ with .Params.tags }}
       <span class="meta-sep">&middot;</span>
       <span class="meta-tags">{{ range $i, $t := . }}{{ if $i }} {{ end }}#{{ $t }}{{ end }}</span>
