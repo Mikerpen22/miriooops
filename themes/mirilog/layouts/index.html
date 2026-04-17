@@ -1,9 +1,20 @@
 {{ define "main" }}
 
-{{ with .Site.Params.bio }}
+{{ $interests := .Site.Params.introInterests }}
+{{ $lead := .Site.Params.introLead }}
+{{ if and $lead $interests }}
+<div class="intro">
+  <p>
+    {{ $lead | markdownify }}
+    <span class="intro-cycle" data-cycle="{{ $interests | jsonify }}">{{ index $interests 0 }}</span>
+  </p>
+</div>
+{{ else }}
+  {{ with .Site.Params.bio }}
 <div class="intro">
   <p>{{ . | markdownify }}</p>
 </div>
+  {{ end }}
 {{ end }}
 
 <p class="section-label">~/posts</p>
@@ -31,5 +42,37 @@
   {{ end }}
 </article>
 {{ end }}
+
+<script>
+  (function () {
+    var el = document.querySelector('.intro-cycle');
+    if (!el) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var phrases;
+    try { phrases = JSON.parse(el.getAttribute('data-cycle')); }
+    catch (e) { return; }
+    if (!Array.isArray(phrases) || phrases.length < 2) return;
+
+    // Visit [1], [2], …, then settle back on [0] — crawlers already saw [0].
+    var order = [];
+    for (var i = 1; i < phrases.length; i++) order.push(i);
+    order.push(0);
+
+    var HOLD = 1600, FADE = 320, step = 0;
+
+    function tick() {
+      el.classList.add('is-swapping');
+      setTimeout(function () {
+        el.textContent = phrases[order[step]];
+        el.classList.remove('is-swapping');
+        step++;
+        if (step < order.length) setTimeout(tick, HOLD);
+      }, FADE);
+    }
+
+    setTimeout(tick, 900); // let the page settle before the first swap
+  })();
+</script>
 
 {{ end }}

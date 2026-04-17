@@ -39,6 +39,15 @@ enableEmoji = true
   siteName = "Michael Shih"
   author = "Michael Shih"
 
+  # Homepage intro. `introLead` is static; `introInterests` cycles once on load
+  # and settles on the first entry (which is also what crawlers see in HTML).
+  introLead = "**physicist turned engineer.** interested in"
+  introInterests = [
+    "artificial intelligence, agent harness, and writing.",
+    "building an agent harness that does real work.",
+    "writing to find out what I think.",
+  ]
+
 # ── Markdown (Goldmark + GFM) ──────────────────
 [markup]
   [markup.goldmark]
