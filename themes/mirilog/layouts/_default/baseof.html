@@ -11,5 +11,91 @@
     </main>
     {{ partial "footer.html" . }}
   </div>
+  <script>
+  (function(){
+    // Theme toggle
+    var btn = document.querySelector('.theme-toggle');
+    if (btn) {
+      btn.addEventListener('click', function(){
+        var current = document.documentElement.getAttribute('data-theme');
+        var next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+      });
+    }
+
+    // Sticky header scroll detection
+    var header = document.getElementById('site-header');
+    if (header) {
+      var onScroll = function() {
+        header.classList.toggle('scrolled', window.scrollY > 20);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+
+    // Code block enhancements (copy button + language label)
+    document.querySelectorAll('.highlight').forEach(function(block) {
+      var pre = block.querySelector('pre');
+      if (!pre) return;
+      var code = pre.querySelector('code');
+      var lang = '';
+      if (code) {
+        var cls = code.className || pre.className || '';
+        var m = cls.match(/language-(\w+)/);
+        if (m) lang = m[1];
+      }
+
+      var hdr = document.createElement('div');
+      hdr.className = 'code-header';
+
+      var langLabel = document.createElement('span');
+      langLabel.className = 'code-lang';
+      langLabel.textContent = lang || 'code';
+      hdr.appendChild(langLabel);
+
+      var copyBtn = document.createElement('button');
+      copyBtn.className = 'code-copy';
+      copyBtn.textContent = 'copy';
+      copyBtn.setAttribute('aria-label', 'Copy code');
+      copyBtn.addEventListener('click', function() {
+        var text = code ? code.textContent : pre.textContent;
+        navigator.clipboard.writeText(text).then(function() {
+          copyBtn.textContent = 'copied!';
+          copyBtn.classList.add('copied');
+          setTimeout(function() {
+            copyBtn.textContent = 'copy';
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        });
+      });
+      hdr.appendChild(copyBtn);
+      block.insertBefore(hdr, pre);
+    });
+
+    // Scroll-triggered fade-in for cards
+    var fadeEls = document.querySelectorAll('.post-card, .tag-card');
+    if (fadeEls.length && 'IntersectionObserver' in window) {
+      fadeEls.forEach(function(el) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(12px)';
+      });
+      var fadeObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var el = entry.target;
+            var idx = Array.prototype.indexOf.call(fadeEls, el);
+            var delay = idx * 50;
+            el.style.transition = 'opacity 500ms cubic-bezier(0.22,1,0.36,1) ' + delay + 'ms, transform 500ms cubic-bezier(0.22,1,0.36,1) ' + delay + 'ms';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+            fadeObserver.unobserve(el);
+          }
+        });
+      }, { threshold: 0.1 });
+      fadeEls.forEach(function(el) { fadeObserver.observe(el); });
+    }
+  })();
+  </script>
 </body>
 </html>

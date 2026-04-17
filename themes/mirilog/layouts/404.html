@@ -1,8 +1,17 @@
 {{ define "main" }}
 
 <div class="not-found">
-  <h1>404</h1>
-  <p>not found. <a href="{{ "/" | relURL }}">cd ~/</a></p>
+  <pre class="not-found-ascii" aria-hidden="true">
+  _  _    ___  _  _
+ | || |  / _ \| || |
+ | || |_| | | | || |_
+ |__   _| | | |__   _|
+    | | | |_| |  | |
+    |_|  \___/   |_|
+  </pre>
+  <p class="not-found-msg">page not found</p>
+  <p class="not-found-hint">the path you followed doesn't exist or has been moved.</p>
+  <a href="{{ "/" | relURL }}" class="back-link">&larr; cd ~/</a>
 </div>
 
 {{ end }}

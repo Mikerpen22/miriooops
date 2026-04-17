@@ -8,13 +8,21 @@
 
 <p class="section-label">~/posts</p>
 
-{{ range where .Site.RegularPages "Section" "posts" }}
-<article class="post-item">
-  <div class="post-item-header">
-    <a href="{{ .Permalink }}" class="post-link">{{ .Title }}</a>
-    <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
+{{ $posts := where .Site.RegularPages "Section" "posts" }}
+{{ range $i, $post := $posts }}
+<article class="post-card{{ if eq $i 0 }} post-card--featured{{ end }}">
+  <div class="post-card-header">
+    <a href="{{ $post.Permalink }}" class="post-card-link">{{ $post.Title }}</a>
+    <div class="post-card-meta">
+      <time class="post-date" datetime="{{ $post.Date.Format "2006-01-02" }}">{{ $post.Date.Format "2006-01-02" }}</time>
+      <span class="meta-sep">&middot;</span>
+      <span class="reading-time">{{ $post.ReadingTime }} min read</span>
+    </div>
   </div>
-  {{ with .Params.tags }}
+  {{ if $post.Summary }}
+  <p class="post-card-excerpt">{{ $post.Summary | plainify | truncate 160 }}</p>
+  {{ end }}
+  {{ with $post.Params.tags }}
   <div class="post-tags">
     {{ range . }}
     <a href="{{ "tags/" | absURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>

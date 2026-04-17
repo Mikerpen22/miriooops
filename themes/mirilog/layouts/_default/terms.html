@@ -2,9 +2,12 @@
 
 <p class="section-label">~/tags</p>
 
-<div class="tags-list">
-  {{ range .Data.Terms.Alphabetical }}
-  <a href="{{ .Page.Permalink }}" class="tag">{{ .Page.Title }}<span class="tag-count">({{ .Count }})</span></a>
+<div class="tags-grid">
+  {{ range .Data.Terms.ByCount }}
+  <a href="{{ .Page.Permalink }}" class="tag-card">
+    <span class="tag-card-name">#{{ .Page.Title }}</span>
+    <span class="tag-card-count">{{ .Count }} {{ if eq .Count 1 }}post{{ else }}posts{{ end }}</span>
+  </a>
   {{ end }}
 </div>
 
