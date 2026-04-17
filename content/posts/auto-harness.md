@@ -4,6 +4,7 @@ author:
 date: 2026-04-17
 linktitle: "Auto-Harness: Frankensteining my way to a better agent"
 title: "Auto-Harness: Frankensteining my way to a better agent"
+description: "Why I built a meta-harness for Claude Code that scans installed skills, spawns parallel variant-builders, and emits a ready-to-use SKILL.md bundle."
 type:
 - post
 - posts

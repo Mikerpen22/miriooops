@@ -96,4 +96,4 @@ enableEmoji = true
   notAlternative = true
 
 [outputs]
-  home = ["HTML", "RSS", "LLMS", "LLMSFULL"]
+  home = ["HTML", "RSS", "LLMS", "LLMSFULL", "ROBOTS"]
