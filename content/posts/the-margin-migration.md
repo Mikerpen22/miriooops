@@ -21,11 +21,9 @@ tags:
 aliases:
 ---
 
-I spend most of my day thinking about systems: where the bottleneck is, who pays for it, and what changes when the bottleneck moves. The same questions apply to the companies that turn electricity into AI tokens.
+AI economics makes more sense to me when I look for the bottleneck. Today it might be model quality; tomorrow it might be memory bandwidth, power, or a transformer that takes five years to deliver. Whoever controls the scarce part gets to keep more of the money.
 
-Kimi K3 changed my view of that stack. I started writing this post to work out what, exactly, had changed.
-
-This is not investment advice. Some of the evidence is solid; some comes from a single source and should be treated accordingly. I list the important uncertainties at the end.
+Kimi K3 made me rethink where that bottleneck is moving.
 
 ### Seventy-two hours in July
 
@@ -37,37 +35,31 @@ The next day, tech investor Gavin Baker described the possible market impact:
 >
 > — Gavin Baker, X, July 17 2026[^baker]
 
-The important qualification is "token efficient." Open weights alone do not make a model cheap to run.
+The last two words matter. Open weights are not automatically cheap weights, especially when the model has 2.8 trillion parameters.
 
-The usual interpretation is "open source wins, closed labs lose." I think that misses the more interesting change:
-
-> As models become easier to substitute, some of the margin moves into the infrastructure that runs them.
-
-That is why I see K3 as an infrastructure story, not just a model-release story.
+K3 raises two separate questions. How close can an open model get to the frontier, and what does it cost to run? It narrows the first gap much more than the second. But each time the model itself becomes easier to replace, bargaining power shifts toward the infrastructure that runs it. That is why I see K3 as an infrastructure release too.
 
 ### When the model layer loses pricing power
 
 Decompose the price of an AI token and you get, roughly: **power + silicon + data center + capital + model margin.**
 
-For the last two years, a few closed labs have controlled the best models. Their scale makes them important buyers of chips, power, and data-center capacity, although they do not control every supply-constrained market below them. The model layer has kept software-like margins because cheaper models could not match its quality.
+For the last two years, a few closed labs have controlled the best models. Their scale makes them important buyers of chips, power, and data-center capacity. The model layer has kept software-like margins because cheaper models could not match its quality.
 
 Near-frontier open weights put pressure on that pricing power. More providers can serve similar models, so the model itself becomes easier to substitute. Meanwhile, every deployment still needs cloud capacity, silicon, memory, power, and interconnect. Those inputs remain scarce regardless of whose weights are loaded.
 
-If cheaper tokens create enough new usage, infrastructure providers can capture part of the value that the model vendors lose. This depends on demand growing faster than prices fall; it is not automatic.
+If cheaper tokens create enough new usage, infrastructure providers can capture part of the value that model vendors lose. The catch is that usage has to grow faster than prices fall.
 
 That is the margin migration: less pricing power in the model, with the remaining scarcity lower in the stack.
 
-Baker also included an important caveat:
+Baker was careful not to claim that this shift had already happened:
 
 > "This is not happening yet. Cheap, mostly open source tokens are likely the majority of volume today but the majority of economic value is still accruing to the most intelligent models. Might change though."[^baker]
 
-The open question is how quickly value moves, if it moves at all. The answer depends heavily on inference hardware and serving costs.
+Whether that shift actually happens comes down to inference hardware, serving costs, and demand.
 
 ### K3 narrows the quality gap, not the cost gap
 
-I had to correct an earlier version of this argument.
-
-K3 is not especially cheap. On Artificial Analysis's per-task numbers, it costs **$0.94 per benchmark task**, compared with **$1.04** for GPT-5.6 Sol.[^aa] That is close to price parity, not a major price break. K3 uses about 21% fewer output tokens than K2 across the evaluation suite, but it is not undercutting the frontier on cost.
+My first read was that K3 had closed both the quality gap and the cost gap. It has not. On Artificial Analysis's per-task numbers, K3 costs **$0.94 per benchmark task**, compared with **$1.04** for GPT-5.6 Sol.[^aa] That is close to price parity, not a price break. K3 uses about 21% fewer output tokens than K2 across the evaluation suite, but it is not undercutting the frontier on cost.
 
 The larger cost gap appears in the tier *below* K3:
 
@@ -82,7 +74,7 @@ The larger cost gap appears in the tier *below* K3:
 
 GLM-5.2 at $0.32 and DeepSeek V4 Pro at roughly four cents show where the price competition is happening. They are not frontier models, but they may be good enough for routine work that does not need the best available model. DeepSeek's per-task cost is about 4% of GPT-5.6 Sol's, which gives companies a strong reason to route simpler requests away from premium models.
 
-The production data also shows how far open models still have to go. Vercel's July AI Gateway index separates token volume from actual spending:[^vercel]
+Vercel's July AI Gateway index makes the remaining gap unusually clear because it separates token volume from spending:[^vercel]
 
 | Measure | Open-weight | Closed + other |
 |---|---:|---:|
@@ -92,19 +84,17 @@ The production data also shows how far open models still have to go. Vercel's Ju
 
 Open models account for 29% of production tokens but less than 4% of spending. Their production token share nearly tripled in two months, while the overwhelming majority of revenue still went to closed models.
 
-The gap between token share and dollar share is the number to watch. If open models begin taking a comparable share of spending, the migration is under way. If their token share stalls, customers are still willing to pay a large premium for frontier quality.
+That gap between token share and dollar share is the number I would watch. If the two begin to converge, closed-model pricing power is weakening. If they do not, customers are still happy to pay a large premium for frontier quality.
 
 ### Why this is a hardware story
 
-The hardware changes are the part I find most interesting. Limited access to high-bandwidth memory pushed Chinese labs to reduce how much memory inference requires. Their solutions are changing the design of inference systems.
-
-Export controls limited Chinese labs' access to high-bandwidth memory. Instead of relying on more HBM, they reduced one of its largest consumers: the key-value (KV) cache. Two published techniques are especially relevant.
+This is where K3 gets interesting to me. Export controls limited Chinese labs' access to high-bandwidth memory. Instead of waiting for more HBM, they attacked one of its largest consumers: the key-value (KV) cache.
 
 **MLA reduces KV-cache bandwidth.** DeepSeek's Multi-head Latent Attention compresses the key-value cache into a shared latent vector: about 68.6 KB per token, versus 4.5 MB for GPT-3-class multi-head attention.[^mla] That is a 67x reduction and allows batches roughly 60 times larger on the same silicon. With some layer reordering, it can also raise the arithmetic intensity of decoding by about 100x, moving attention decode from a memory bottleneck toward a compute bottleneck.
 
-**Kimi Delta Attention slows cache growth.** K3 interleaves linear-attention layers with full attention at a 3:1 ratio, so only a quarter of the layers keep a cache that grows with context.[^kda] Moonshot reports about 75% less KV memory and up to six times the decode throughput at a million tokens. It also claims that the hybrid matches or beats full attention on quality. That quality result is self-reported, so I give it less weight than the memory and throughput measurements.
+**Kimi Delta Attention slows cache growth.** K3 interleaves linear-attention layers with full attention at a 3:1 ratio, so only a quarter of the layers keep a cache that grows with context.[^kda] Moonshot reports about 75% less KV memory and up to six times the decode throughput at a million tokens. The company also says the hybrid matches or beats full attention on quality, although that claim still needs independent testing at K3's scale.
 
-The reductions look like this:
+Put side by side, the difference is large:
 
 | Architecture | KV cache per token |
 |---|---:|
@@ -113,15 +103,13 @@ The reductions look like this:
 | MLA (DeepSeek) | 68.6 KB |
 | KDA 3:1 hybrid (Kimi K3) | ~17 KB effective |
 
-At first glance, this looks like bad news for memory suppliers. That conclusion ignores where the next bottleneck appears.
+This sounds like bad news for memory suppliers until you follow the bottleneck to its next stop.
 
-**The bottleneck moves; it does not disappear.** MLA reduces KV-cache pressure, but sparse mixture-of-experts (MoE) models still need to read very large sets of model weights. Arithmetic intensity explains why this matters.
+**The cache shrinks, but the weights remain.** MLA reduces KV-cache pressure, while sparse mixture-of-experts (MoE) models still need to read very large sets of model weights. Arithmetic intensity explains why this matters.
 
-Whether inference is memory-bound or compute-bound comes down to **arithmetic intensity**: FLOPs performed per byte you drag out of memory. A GPU has two ceilings: how fast it can compute, and how fast it can read HBM. Their ratio is a break-even of a few hundred FLOPs per byte. Below that line you're memory-bound and the compute units sit idle waiting for data. Above it, memory keeps up and compute is the limit.
+Whether inference is memory-bound or compute-bound comes down to **arithmetic intensity**: how much math the GPU can do for every byte it pulls from memory. A GPU has two ceilings, one for computation and one for HBM bandwidth. Below their break-even point, the compute units sit idle waiting for data. Above it, memory keeps up and computation becomes the limit.
 
-The main lever on that ratio is **batch size**:
-
-> The weights get read from HBM *once per forward pass*, no matter how many requests share it. The FLOPs scale with the number of requests. So arithmetic intensity rises roughly linearly with batch size.
+The main lever on that ratio is **batch size**. The weights are read from HBM once per forward pass, no matter how many requests share it, while the FLOPs scale with the number of requests. Arithmetic intensity therefore rises roughly in line with batch size.
 
 At a batch size of 1, the system loads a large weight matrix to perform one matrix-vector multiplication. There is little computation relative to the amount of data moved, so inference is memory-bound. At a batch size of 256, the system can reuse those weights across 256 requests and may become compute-bound instead.
 
@@ -133,9 +121,9 @@ Extreme sparsity saves computation but reduces the benefit of batching. The feed
 - **From single-GPU memory to interconnect.** When experts are spread across GPUs, routing creates irregular all-to-all traffic. The network can become the constraint, increasing the importance of switch and retimer silicon.
 - **From raw bandwidth to compute density.** Once attention decode goes compute-bound, the ideal inference part carries more FLOPs per dollar and less exotic memory. That's exactly the custom-ASIC and SRAM-heavy design point.
 
-The headline "67x less memory" also needs context: it compares MLA with GPT-3-era attention. Against the grouped-query attention common in current models, the KV-cache advantage is roughly 3–7x. That is useful, but much less dramatic.
+The "67x less memory" headline also flatters the comparison because the baseline is GPT-3-era attention. Against the grouped-query attention used in current models, MLA's KV-cache advantage is closer to 3–7x. Still useful, just less miraculous.
 
-My conclusion on memory has two time horizons. Current supply constraints support demand in 2026–27, while architectural changes could reduce memory requirements later. The near-term shortage and the longer-term design risk can both be true.
+For memory vendors, the timing is awkward: supply is tight in 2026–27, but the architectures being developed during that shortage may reduce how much memory future systems need.
 
 ### Does cheaper intelligence mean less spend, or more?
 
@@ -143,13 +131,13 @@ The rest of the argument depends on one question: when the price of intelligence
 
 If usage grows faster than prices fall, infrastructure providers benefit. If demand saturates, the industry has built too much capacity and there may be little margin to redistribute.
 
-The evidence I found points toward strong demand growth. Goldman models token usage growing 24-fold by 2030, to about 120 quadrillion tokens a month, while inference cost per token falls 60–70% a year. Its model has hyperscaler gross margins rising because costs fall faster than prices.[^goldman] Agent workflows add to that demand: one agent interaction may use about 30 times as many tokens as a chat turn, and sometimes much more.[^ey]
+Goldman models token usage growing 24-fold by 2030, to about 120 quadrillion tokens a month, while inference cost per token falls 60–70% a year. In that model, hyperscaler gross margins rise because costs fall faster than prices.[^goldman] Agent workflows add another source of demand: one agent interaction may use about 30 times as many tokens as a chat turn, and sometimes much more.[^ey]
 
 Some of today's token growth is waste rather than durable demand. On identical coding tasks, token consumption can vary by as much as 30 times from run to run. Accuracy peaks at an intermediate level of spending and then saturates, and models are poor at predicting their own usage.[^agent] Successful tasks are therefore a better demand measure than raw token counts.
 
-Companies are also starting to control waste. Gartner expects more than 40% of agentic AI projects to be canceled by the end of 2027.[^gartner] Meta's Adam Mosseri said in mid-July that per-engineer token budgets are likely, after Meta shut down an internal spending leaderboard that had pushed projected costs toward billions.[^mosseri] I read this as tighter cost control, not necessarily falling demand. The same Gartner note projects agentic AI in a third of enterprise software by 2028.
+The cleanup has already started. Gartner expects more than 40% of agentic AI projects to be canceled by the end of 2027.[^gartner] Meta's Adam Mosseri said in mid-July that per-engineer token budgets are likely, after Meta shut down an internal spending leaderboard that had pushed projected costs toward billions.[^mosseri] That looks more like the end of unlimited experimentation than the end of demand. The same Gartner note projects agentic AI in a third of enterprise software by 2028.
 
-The arithmetic still sets a demanding threshold:
+But 24-fold token growth does not guarantee revenue growth. The price decline still has to be beaten:
 
 | Price deflation | Volume growth needed to keep revenue flat |
 |---|---:|
@@ -160,11 +148,9 @@ The arithmetic still sets a demanding threshold:
 
 Goldman's implied volume growth is about 121% a year. At that rate, token *revenue* grows only if realized *prices* fall by less than about 55% a year. Goldman's 60–70% figure refers to *cost* reduction. Hyperscaler margins improve only if costs continue to fall faster than prices.
 
-Token growth alone is not enough. The key metric is whether open-model competition forces realized prices to fall at the same rate as costs. If it does, usage can grow rapidly while revenue growth slows. Realized revenue per million tokens is more informative than advertised list prices.
+What matters is whether open-model competition forces realized prices down as quickly as serving costs fall. If it does, usage can soar while revenue growth slows. Realized revenue per million tokens tells us more than advertised list prices.
 
 ### So where does the margin land?
-
-The argument has different implications for each part of the infrastructure stack.
 
 **Infrastructure providers benefit if demand remains elastic.** Hyperscalers can serve whichever model customers choose, and they gain margin if serving costs fall faster than prices. Custom ASICs from Broadcom and Marvell matter because hyperscalers use their own silicon to reduce serving costs. Broadcom reported $10.8 billion in quarterly AI revenue, up 143%, and guided to $16 billion for the next quarter.[^avgo]
 
@@ -172,49 +158,36 @@ The argument has different implications for each part of the infrastructure stac
 
 **For neoclouds, financing matters as much as demand.** Open models can run outside the large hyperscalers, which creates demand for independent GPU providers. But new hardware also makes older GPU fleets less competitive. The important variables are therefore debt, interest expense, and whether the useful life of the hardware matches its depreciation schedule.
 
-**Memory has different short- and long-term risks, as discussed above.** **Power equipment remains constrained.** Transformer lead times have reportedly stretched from about two years to five, giving suppliers pricing power across most demand scenarios.
+**Memory vendors face the short- and long-term tension described above.** **Power equipment has a simpler setup:** transformer lead times have reportedly stretched from about two years to five, which gives suppliers pricing power across most demand scenarios.
 
 ### Three scenarios
 
-These probabilities are my own estimates, not model output or market forecasts. Another researcher reviewing the same evidence produced estimates within five percentage points of mine. That made me more comfortable with the three scenarios, but not with the exact probabilities.
+I can see three ways this develops.
 
-- **Gradual erosion (55%).** Open models remain 6–12 months behind and less token-efficient. Frontier labs keep a quality premium but gradually lose pricing power. Infrastructure demand continues to grow.
-- **US pulls ahead (30%).** Frontier labs turn compute into capability faster than open labs can copy or distill their results. Their models remain difficult to substitute, preserving their pricing power and leverage over suppliers.
-- **Outright loss (15%).** An open model matches the frontier and uses fewer tokens per task. This is Baker's "real Sputnik" condition. Closed-lab pricing falls sharply, training capital expenditure is cut, and inference demand continues to grow on open weights.
+- **Gradual erosion seems most likely.** Open models remain 6–12 months behind and less token-efficient. Frontier labs keep a quality premium, but the premium shrinks as more work moves to cheaper models. Infrastructure demand continues to grow.
+- **The US labs pull away again.** Frontier labs turn compute into capability faster than open labs can copy or distill their results. Their models remain hard to substitute, preserving both pricing power and leverage over suppliers.
+- **An open model reaches the frontier and runs more efficiently.** Closed-model pricing falls quickly, training budgets come under pressure, and more inference moves to open weights.
 
-Across these scenarios, infrastructure is less dependent on any one model vendor winning. That is the main reason I prefer the lower layers of the stack.
+In all three cases, the lower layers depend less on which model vendor wins. That is the appeal.
 
-### What I'm not sure about
+### Where this could be wrong
 
-Several parts of this argument are better supported than others.
+I may be overestimating how much model margin exists in the first place. Chips, power, networking, reliability, sales, and safety all sit behind the price of a token. If those costs already consume most of the revenue, lower model prices hurt the whole stack rather than enriching the layers below it.
 
-I reviewed about 22 sources and checked the claims that materially affect the conclusion against multiple sources where possible.
+I may also be underestimating the engineers. MLA, MoE, and attention optimizations relieve one bottleneck and expose others, especially batching, interconnect, and utilization. If they work through those constraints faster than agent workloads expand, the industry will need less hardware than today's forecasts assume.
 
-**Claims I could verify:** Baker's posts and the quoted text; K3's specifications and pricing; the MLA and delta-attention efficiency numbers; Vercel's token-volume and spending split; Goldman's forecast; NVIDIA's and Broadcom's reported results; the research on agent token variance; and Meta's discussion of spending caps.
+And I may be early. A cheaper model can appear overnight; enterprise spending does not move that quickly. Reliability, procurement, compliance, and existing product integrations can protect an incumbent long after its technical lead narrows.
 
-**Claims I rejected after checking:**
+K3 has not collapsed model pricing. What changed for me is simpler: I no longer assume frontier quality will stay scarce just because it is scarce now. Models can be copied and improved quickly. Power, memory, interconnect, data-center capacity, and distribution move much more slowly.
 
-- "Frontier labs earn 90%+ inference margins." That's Baker's framing, not established fact.
-- "MLA/MoE breaks the HBM thesis." It reduces one source of memory pressure but creates or exposes others.
-- "Agentic AI is a ~1000x token multiplier." Enterprise-wide it's more like 10–100x, centered near 30x. The 1000x figure is real *only* for autonomous coding agents versus code chat, and it's driven by input tokens, which is why cache-hit pricing is the actual strategic battleground.
-- "Chinese open models exert minimal pricing pressure." The pressure is visible; the uncertain part is how quickly it will affect revenue.
-
-**Claims I could not verify independently:** the neocloud drawdown levels, the exact ASIC market-share figures, and a McKinsey estimate that puts gross margins for pure GPU rental at 14–16%. I have not used those figures as primary support for the conclusion. The McKinsey estimate would materially weaken the case for highly leveraged GPU-rental businesses, so it needs better evidence before I rely on it.
-
-I also found only one investor, Gavin Baker, making the specific market argument quoted in this post. I looked for a comparable view from Brad Gerstner but could not verify one from this period. Baker's view is useful, but it is not evidence of a Wall Street consensus.
-
-The shortest version of my argument is:
-
-> When scarcity moves to another part of the stack, margins tend to move with it.
-
-*Not investment advice. I hold positions in some of the companies discussed. If the batching argument or another technical mechanism is wrong, I would like to know; the thesis depends more on those mechanisms than on the market labels.*
+*Not investment advice. I hold positions in some of the companies discussed.*
 
 [^k3]: Moonshot AI, ["Kimi K3"](https://www.kimi.com/blog/kimi-k3) (blog, July 16 2026); model card on [OpenRouter](https://openrouter.ai/moonshotai/kimi-k3). Performance and efficiency figures are vendor-reported pending the July 27 open-weight release and independent replication at 2.8T scale.
 [^aa]: Artificial Analysis, ["Kimi K3 in the Artificial Analysis Intelligence Index"](https://artificialanalysis.ai/articles/kimi-k3-achieves-3-in-the-artificial-analysis-intelligence-index-comparable-to-opus-4-8-and-gpt-5-5/): index scores and per-task cost, including K3 at $0.94/task vs GPT-5.6 Sol at $1.04.
-[^baker]: Gavin Baker on X, [July 17 2026](https://x.com/GavinSBaker/status/2078110934740980193) and [July 12](https://x.com/GavinSBaker/status/2076369936251851091). X blocked direct fetch; quotes triangulated from index snippets and two independent write-ups.
-[^vercel]: Vercel, ["AI Gateway Production Index, July 2026"](https://vercel.com/blog/ai-gateway-production-index-july-2026). Open-weight at 29% of production tokens and under 4% of spend; DeepSeek alone 22.6% of token volume. OpenRouter's ~61% figure is a hobbyist/arbitrage-heavy population and is directionally, not precisely, sourced.
-[^mla]: Arithmetic-intensity and KV-cache figures from [arXiv 2507.15465](https://arxiv.org/html/2507.15465) and [2506.02523](https://arxiv.org/abs/2506.02523); re-derived rather than taken on the authors' word. The GQA-vs-MLA 3–7x range is verified against the same work.
-[^kda]: Kimi Linear / Kimi Delta Attention: [arXiv 2510.26692](https://arxiv.org/pdf/2510.26692). The −75% KV and 6x decode numbers are Moonshot's, at a matched 48B scale; the "beats full attention" Pareto claim is the weakest link and I treat it as such.
+[^baker]: Gavin Baker on X, [July 17 2026](https://x.com/GavinSBaker/status/2078110934740980193) and [July 12](https://x.com/GavinSBaker/status/2076369936251851091).
+[^vercel]: Vercel, ["AI Gateway Production Index, July 2026"](https://vercel.com/blog/ai-gateway-production-index-july-2026). Open-weight models accounted for 29% of production tokens and less than 4% of spending; DeepSeek alone accounted for 22.6% of token volume.
+[^mla]: Arithmetic-intensity and KV-cache figures from [arXiv 2507.15465](https://arxiv.org/html/2507.15465) and [arXiv 2506.02523](https://arxiv.org/abs/2506.02523).
+[^kda]: Kimi Linear / Kimi Delta Attention: [arXiv 2510.26692](https://arxiv.org/pdf/2510.26692). The 75% KV reduction and 6x decode figures are Moonshot's measurements at a matched 48B scale.
 [^goldman]: Goldman Sachs Research, ["AI agents forecast to boost tech cash flow as usage soars"](https://www.goldmansachs.com/insights/articles/ai-agents-forecast-to-boost-tech-cash-flow-as-usage-soars) (May 20 2026).
 [^ey]: EY, ["Agentic AI token costs"](https://www.ey.com/en_us/insights/ai/agentic-ai-token-costs). The ~30x figure is a center estimate; production ranges run 10–100x.
 [^agent]: ["Forecasting agent token usage"](https://arxiv.org/abs/2604.22750): 30x run-to-run variance on identical tasks, accuracy peaking at intermediate spend, and self-prediction correlation ≤0.39. Also the source for the narrow, input-driven ~1000x autonomous-coding figure.

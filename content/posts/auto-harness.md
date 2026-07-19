@@ -25,21 +25,13 @@ After using Claude Code for a few weeks, I ended up with a collection of agent h
 
 `superpowers` provides a structured brainstorm → plan → execute → review workflow. `ralph-loop` runs an autonomous loop until the CI passes. `pr-review-toolkit` uses specialized reviewer subagents. Each is useful, but each assumes that its own workflow controls the task.
 
-My actual projects often need parts of all three:
-
-> "I want the brainstorming discipline from superpowers, but the autonomous loop from ralph, but with a judge agent at the end like the PR toolkit does. And please don't make me copy-paste three SKILL.md files together at 11pm."
-
-I built `auto-harness` to assemble that combination without manually merging several `SKILL.md` files.
+My projects rarely line up that neatly. I might want `superpowers` to plan the work, a Ralph-style loop to grind through it, and a separate reviewer at the end. After manually splicing those instructions together a few times, I built `auto-harness` to do the splicing for me.
 
 ### What I needed
 
-I did not want another fixed workflow. I wanted a **meta-harness** that could inspect the project and the installed skills, then generate a new skill from the relevant parts.
+Writing a fourth fixed workflow would only make the drawer messier. I wanted a **meta-harness**: something that could inspect the current project and the skills already installed, then build a purpose-specific skill from the useful pieces.
 
-Three properties I refused to compromise on:
-
-1. **It had to run entirely inside Claude Code.** I did not want a separate Python service or API orchestrator to install and maintain.
-2. **It had to enforce a token budget.** Generating and evaluating several variants is expensive, so the number of subagent calls must be bounded.
-3. **It had to distinguish estimates from measurements.** A judge subagent can rank generated variants, but that ranking is not a benchmark.
+I also wanted it to remain boring to operate. It runs inside Claude Code, with no Python service or API orchestrator on the side. It puts a hard ceiling on subagent calls because generating several candidates gets expensive quickly. And whenever a model judges another model's work, the result is labeled as an opinion rather than dressed up as benchmark data.
 
 ### The shape it took
 
@@ -56,18 +48,18 @@ Phase 6:    Synthesize champion : build the final SKILL.md bundle
 Phase 7:    Emit & install      : write to ./generated-skill/ (or ~/.claude/skills/)
 ```
 
-Phase 3 is the expensive part. Running several subagents can produce meaningfully different designs, but it also consumes most of the token budget. Before starting that phase, the skill asks for confirmation:
+Phase 3 spends most of the tokens. Before it launches the variant builders, the skill stops and says exactly what it is about to do:
 
 ```
 I'm about to spawn 4 variant-builder subagents in parallel.
 This is the token-expensive step. Proceed? (y/N)
 ```
 
-That prompt has prevented more than one accidental, expensive run.
+I have said no to that prompt more often than I expected.
 
 ### Starting from known patterns
 
-Instead of asking the model to invent every workflow from scratch, I gave it a catalog of six patterns:
+Starting from a blank prompt produced workflows that sounded different but behaved almost identically. The fix was a small catalog of structures with known tradeoffs:
 
 - `three-agent`: Planner → Generator → Evaluator (long coding tasks)
 - `research-triad`: Searcher → Synthesizer → Verifier (fact-grounded writing)
@@ -76,9 +68,9 @@ Instead of asking the model to invent every workflow from scratch, I gave it a c
 - `ralph-style-loop`: single-agent autonomous loop (open-ended)
 - `superpowers-workflow`: brainstorm → plan → execute → review
 
-Each pattern has a **probe file** listing the failure modes it is likely to encounter. Variant builders must address those failure modes, and the judge includes them in its scoring.
+Each pattern has a **probe file** describing the failures it tends to invite. A long autonomous loop can lose the original goal; a research pipeline can pass the same unsupported claim from one agent to the next. The variant builders have to account for those failures, and the judge scores how well they did.
 
-The catalog makes the output more predictable and easier to review. A free-form option remains available when none of the six patterns fits.
+Those six patterns have covered my projects so far. The free-form route is there for the odd case that does not fit.
 
 ### The compose / extend / replace menu
 
@@ -95,7 +87,7 @@ How should the generated harness relate to what you have?
   replace     : domain-specialized alternative to an installed harness
 ```
 
-I use `compose` most often. It records which installed skill handles each phase, so the relationship is explicit and does not depend on manually copied instructions.
+I use `compose` most often. The generated skill records which installed skill owns each phase, so I can see the handoffs without digging through copied instructions.
 
 ### Scores are estimates, not benchmarks
 
@@ -113,7 +105,7 @@ Every generated bundle includes a `scorecard.md`:
 > Run `evaluation-protocol.md` against your real tasks to get real data.
 ```
 
-The score is explicitly labeled as an estimate. Each bundle also includes an `evaluation-protocol.md` template for testing the generated skill on real tasks. This prevents a model-generated ranking from being presented as measured performance.
+The numbers are only the judge's shorthand for its preference. They help choose which candidate to inspect first; they do not show that the candidate works. Each bundle therefore includes an `evaluation-protocol.md` for running the generated skill against real tasks.
 
 ### Using it
 
@@ -133,23 +125,26 @@ Then, inside any Claude Code session:
 
 Answer the two intake questions, choose a composition strategy, and approve the parallel dispatch. On my setup, a typical run takes about 40 seconds and writes the result to `./generated-skill/`.
 
-### What it's not
+### What it cannot decide
 
-- **Not a benchmark.** The scorecard is a guess. Real data comes from running the generated skill on your real work.
-- **Not a universal harness.** Six patterns plus an escape hatch is opinionated on purpose.
-- **Not a "one-click agent factory."** It assumes that the user can review the generated workflow and knows what tradeoffs matter for the project.
+`auto-harness` can compare candidate workflows, but it cannot decide what "good" means for a project. A refactoring agent may need caution and clean checkpoints; a migration agent may need persistence and a strong rollback path. The intake questions capture some of that context, but the generated `SKILL.md` still needs to be read by the person who will run it.
 
-### Lessons from building it
+I keep the catalog narrow for the same reason. I would rather inspect a recognizable workflow than untangle a novel agent hierarchy after it fails.
 
-1. **Orchestration can be more useful than another standalone skill.** My setup improved once the harnesses could delegate to one another instead of each trying to own the entire task.
-2. **A budget has to be enforced in code or instructions.** `auto-harness` allows at most nine subagent dispatches. Without that limit, I would hesitate to run it on ordinary work.
-3. **Parallel subagents need distinct assignments.** Each variant builder receives a different set of two or three design changes. Without those constraints, the outputs differ mostly in wording. With them, the judge has genuinely different designs to compare.
-4. **The supporting checks make the output usable.** The bundle schema, front matter linter, and "write to disk last" rule are less visible than the generation step, but they prevent malformed or partial skills from being installed.
+### What changed while building it
+
+My first version simply asked several subagents for their best design. They returned the same workflow in different prose. Parallelism alone did not create useful variety.
+
+Now each variant builder gets a different set of two or three changes to explore: stricter recovery, a smaller loop, a separate judge, a different routing rule. Once the candidates are forced to disagree, the comparison becomes useful.
+
+The token limit also moved from a suggestion to a rule. `auto-harness` allows at most nine subagent dispatches. If the budget lived only in the prompt, every phase could find a good reason to spend a little more.
+
+The part I trust most is not the judge. It is the bundle schema that catches missing files, the front matter linter that catches skills Claude Code cannot load, and the "write to disk last" rule that keeps an interrupted run from leaving behind something that looks installable. Those checks are what make me comfortable using the generated skill.
 
 ### Links
 
 - **Repo:** [github.com/Mikerpen22/auto-harness](https://github.com/Mikerpen22/auto-harness)
 - **License:** MIT
-- **Contributing:** PRs for new patterns or probes are welcome. Probe PRs need a written justification of the failure mode the probe catches. (Yes, that's on purpose.)
+- **Contributing:** PRs for new patterns or probes are welcome. A new probe should explain the failure it is meant to catch.
 
-If a generated harness does not fit your project, open an issue with the failure case. That feedback is more useful to me than a star count.
+If a generated harness falls apart on your project, open an issue with the failure case. That is the part I want to learn from.
