@@ -352,6 +352,25 @@ img {
   transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.github-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.github-link:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+  border-color: var(--border-light);
+}
+
 .theme-toggle:hover {
   color: var(--text);
   background: var(--bg-hover);
@@ -1225,6 +1244,7 @@ a:focus-visible,
 .tag-card:focus-visible,
 .back-link:focus-visible,
 .back-to-top:focus-visible,
+.github-link:focus-visible,
 .theme-toggle:focus-visible,
 .site-nav a:focus-visible {
   outline: none;
@@ -1259,11 +1279,36 @@ a:focus-visible,
     gap: 2px;
   }
 
-  .site-nav a {
-    padding: 5px 8px;
-    font-size: 12px;
+  .site-name {
+    font-size: 13px;
+    white-space: nowrap;
   }
 
+  .site-nav {
+    gap: 0;
+  }
+
+  .site-nav a {
+    padding: 5px 6px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 359px) {
+  .site-header {
+    flex-wrap: wrap;
+  }
+
+  .site-name {
+    flex-basis: 100%;
+  }
+
+  .header-right {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 600px) {
   .intro {
     font-size: 16px;
     max-width: 100%;
