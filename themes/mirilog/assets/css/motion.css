@@ -88,9 +88,8 @@
 }
 
 /* ── Cross-document page transitions ─────────── */
-@view-transition {
-  navigation: auto;
-}
+/* The @view-transition opt-in lives inline in partials/head.html:
+   the minifier drops unknown at-rules from bundled CSS. */
 
 .site-header {
   view-transition-name: site-header;
