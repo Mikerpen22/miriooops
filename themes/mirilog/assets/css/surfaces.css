@@ -1,0 +1,91 @@
+/* ══════════════════════════════════════════════
+   Surface tiers — the glass material system
+   flat: in-flow content boxes (no blur)
+   raised: chrome sitting on content (12px blur)
+   floating: chrome hovering over scroll (20px blur)
+   Quiet modifier: material appears only on interaction.
+   ══════════════════════════════════════════════ */
+
+.surface {
+  background: var(--surface-flat-fill);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--surface-radius-card);
+}
+
+.surface--raised,
+.surface--floating {
+  background: var(--surface-raised-fill);
+  border: 1px solid var(--surface-border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    inset 0 -1px 0 var(--glass-edge-bottom),
+    var(--glass-shadow-raised);
+  backdrop-filter: blur(var(--surface-raised-blur)) saturate(var(--surface-saturate));
+  -webkit-backdrop-filter: blur(var(--surface-raised-blur)) saturate(var(--surface-saturate));
+}
+
+.surface--floating {
+  background: var(--surface-floating-fill);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    inset 0 -1px 0 var(--glass-edge-bottom),
+    var(--glass-shadow-floating);
+  backdrop-filter: blur(var(--surface-floating-blur)) saturate(var(--surface-saturate));
+  -webkit-backdrop-filter: blur(var(--surface-floating-blur)) saturate(var(--surface-saturate));
+}
+
+/* Quiet: same material, but invisible at rest.
+   Transition lives here (resting state) so leaving mid-hover reverses smoothly. */
+.surface--quiet {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition:
+    background var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+.surface--quiet:hover,
+.surface--quiet:focus-visible {
+  background: var(--surface-raised-fill);
+  border-color: var(--surface-border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-edge),
+    inset 0 -1px 0 var(--glass-edge-bottom),
+    var(--glass-shadow-raised);
+  backdrop-filter: blur(var(--surface-raised-blur)) saturate(var(--surface-saturate));
+  -webkit-backdrop-filter: blur(var(--surface-raised-blur)) saturate(var(--surface-saturate));
+}
+
+.surface--quiet:active {
+  transform: scale(0.96);
+}
+
+/* ── Fallbacks: collapse glass to solid ──────── */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --surface-raised-fill: var(--bg);
+    --surface-floating-fill: var(--bg);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --surface-raised-fill: var(--bg);
+    --surface-floating-fill: var(--bg);
+  }
+
+  .surface--raised,
+  .surface--floating,
+  .surface--quiet:hover,
+  .surface--quiet:focus-visible,
+  .site-header {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}

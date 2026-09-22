@@ -1,0 +1,165 @@
+/* ══════════════════════════════════════════════
+   MiriLog tokens — color, glass, motion, spacing
+   ══════════════════════════════════════════════ */
+
+/* ── Color ───────────────────────────────────── */
+:root {
+  --bg: #faf9f7;
+  --bg-hover: rgba(233, 84, 32, 0.04);
+  --bg-code: #1a1816;
+  --text: #1a1410;
+  --text-body: #3d3530;
+  --text-secondary: #78706a;
+  --text-muted: #a8a099;
+  --text-faint: #d6d0cb;
+  --border: #e8e3de;
+  --border-light: #f0ece8;
+  --ring: rgba(233, 84, 32, 0.3);
+  --accent: #E95420;
+  --accent-text: #C44117;
+  --accent-tint: #FEF0EB;
+  --accent-line: rgba(233, 84, 32, 0.3);
+  --table-header-bg: #faf9f7;
+  --inline-code-bg: #f5f0ec;
+  --checkbox-border: #d6d0cb;
+
+  /* Glass material (light) */
+  --glass-edge: rgba(255, 255, 255, 0.65);
+  --glass-edge-bottom: rgba(26, 20, 16, 0.06);
+  --glass-shadow-floating: 0 8px 32px rgba(26, 20, 16, 0.10), 0 1px 2px rgba(26, 20, 16, 0.04);
+  --glass-shadow-raised: 0 1px 2px rgba(26, 20, 16, 0.04);
+}
+
+/* System preference fallback (no JS) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c0a09;
+    --bg-hover: rgba(233, 84, 32, 0.06);
+    --bg-code: #14120f;
+    --text: #faf5f0;
+    --text-body: #d6cfc8;
+    --text-secondary: #a8a099;
+    --text-muted: #524d48;
+    --text-faint: #302c28;
+    --border: #2a2623;
+    --border-light: #1e1b18;
+    --ring: rgba(233, 84, 32, 0.4);
+    --accent: #F0764D;
+    --accent-text: #F0764D;
+    --accent-tint: #1f1410;
+    --accent-line: rgba(240, 118, 77, 0.3);
+    --table-header-bg: #14120f;
+    --inline-code-bg: #1e1b18;
+    --checkbox-border: #3f3a35;
+
+    /* Glass material (dark) */
+    --glass-edge: rgba(255, 255, 255, 0.09);
+    --glass-edge-bottom: rgba(0, 0, 0, 0.45);
+    --glass-shadow-floating: 0 8px 32px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.4);
+    --glass-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Explicit dark mode override */
+:root[data-theme="dark"] {
+  --bg: #0c0a09;
+  --bg-hover: rgba(233, 84, 32, 0.06);
+  --bg-code: #14120f;
+  --text: #faf5f0;
+  --text-body: #d6cfc8;
+  --text-secondary: #a8a099;
+  --text-muted: #524d48;
+  --text-faint: #302c28;
+  --border: #2a2623;
+  --border-light: #1e1b18;
+  --ring: rgba(233, 84, 32, 0.4);
+  --accent: #F0764D;
+  --accent-text: #F0764D;
+  --accent-tint: #1f1410;
+  --accent-line: rgba(240, 118, 77, 0.3);
+  --table-header-bg: #14120f;
+  --inline-code-bg: #1e1b18;
+  --checkbox-border: #3f3a35;
+
+  /* Glass material (dark) */
+  --glass-edge: rgba(255, 255, 255, 0.09);
+  --glass-edge-bottom: rgba(0, 0, 0, 0.45);
+  --glass-shadow-floating: 0 8px 32px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --glass-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Spacing scale (4pt base) ────────────────── */
+:root {
+  --sp-xs: 4px;
+  --sp-sm: 8px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  --sp-xl: 40px;
+  --sp-2xl: 64px;
+  --sp-3xl: 96px;
+}
+
+/* ── Type scale ──────────────────────────────── */
+:root {
+  --fs-2xs: 10px;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-base: 14px;
+  --fs-body: 16px;
+  --fs-lg: 18px;
+  --fs-xl: clamp(18px, 3.5vw, 20px);
+  --fs-2xl: clamp(20px, 4vw, 24px);
+  --fs-3xl: clamp(28px, 5vw, 36px);
+  --fs-display: clamp(32px, 7vw, 48px);
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  --ls-display: -0.03em;
+  --ls-heading: -0.02em;
+  --ls-tight: -0.01em;
+  --ls-label: 0.1em;
+}
+
+/* ── Radius scale ────────────────────────────── */
+:root {
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --gutter: clamp(20px, 4vw, 48px);
+}
+
+/* ── Glass material: theme-neutral tiers ─────── */
+:root {
+  /* Fill = page bg with some transparency; blur reveals content beneath */
+  --surface-flat-fill: var(--bg-hover);
+  --surface-raised-fill: color-mix(in srgb, var(--bg) 72%, transparent);
+  --surface-floating-fill: color-mix(in srgb, var(--bg) 62%, transparent);
+  --surface-raised-blur: 12px;
+  --surface-floating-blur: 20px;
+  --surface-saturate: 1.4;
+  --surface-border: color-mix(in srgb, var(--border) 60%, transparent);
+  /* Code blocks are dark in both themes, so their chrome cannot use page-bg glass */
+  --surface-code-fill: rgba(255, 255, 255, 0.04);
+  --surface-code-fill-hover: rgba(255, 255, 255, 0.09);
+  --surface-code-edge: rgba(255, 255, 255, 0.07);
+  --surface-code-text: #a8a099;
+  --surface-code-text-strong: #faf5f0;
+  --surface-radius-pill: 100px;
+  --surface-radius-card: var(--radius-lg);
+}
+
+/* ── Motion ──────────────────────────────────── */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 500ms;
+  --header-float-top: 10px;
+  --header-float-inset: -12px;
+  --header-morph-distance: 120px;
+}

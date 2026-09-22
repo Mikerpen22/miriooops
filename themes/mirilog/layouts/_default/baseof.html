@@ -27,8 +27,11 @@
     // Sticky header scroll detection
     var header = document.getElementById('site-header');
     if (header) {
+      var SHOW_AT = 24, HIDE_AT = 12;
       var onScroll = function() {
-        header.classList.toggle('scrolled', window.scrollY > 20);
+        var y = window.scrollY;
+        if (y > SHOW_AT) header.classList.add('scrolled');
+        else if (y < HIDE_AT) header.classList.remove('scrolled');
       };
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();

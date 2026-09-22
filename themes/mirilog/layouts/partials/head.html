@@ -44,7 +44,8 @@
 </script>
 
 {{/* CSS via Hugo Pipes */}}
-{{ $css := resources.Get "css/main.css" | resources.Minify | resources.Fingerprint }}
+{{ $sheets := slice (resources.Get "css/tokens.css") (resources.Get "css/surfaces.css") (resources.Get "css/motion.css") (resources.Get "css/main.css") }}
+{{ $css := $sheets | resources.Concat "css/site.css" | resources.Minify | resources.Fingerprint }}
 <link rel="stylesheet" href="{{ $css.Permalink }}" integrity="{{ $css.Data.Integrity }}" crossorigin="anonymous">
 
 {{/* RSS */}}
