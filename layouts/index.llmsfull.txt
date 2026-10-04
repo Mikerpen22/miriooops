@@ -5,7 +5,7 @@
 ## Author
 
 {{ .Site.Params.author }} — {{ .Site.Params.bio }}
-{{ range where .Site.RegularPages "Section" "posts" }}
+{{ range (where .Site.RegularPages "Section" "posts").ByDate.Reverse }}
 
 ---
 

@@ -6,7 +6,10 @@
 <div class="intro">
   <p>
     {{ $lead | markdownify }}
-    <span class="intro-cycle" data-cycle="{{ $interests | jsonify }}">{{ index $interests 0 }}</span>
+    <span class="intro-cycle" data-cycle="{{ $interests | jsonify }}">
+      {{ range $interests }}<span class="intro-cycle-sizer" aria-hidden="true">{{ . }}</span>{{ end }}
+      <span class="intro-cycle-text">{{ index $interests 0 }}</span>
+    </span>
   </p>
 </div>
 {{ else }}
@@ -17,30 +20,11 @@
   {{ end }}
 {{ end }}
 
-<p class="section-label">~/posts</p>
+<h1 class="section-label">~/posts</h1>
 
-{{ $posts := where .Site.RegularPages "Section" "posts" }}
+{{ $posts := (where .Site.RegularPages "Section" "posts").ByDate.Reverse }}
 {{ range $i, $post := $posts }}
-<article class="post-card{{ if eq $i 0 }} post-card--featured{{ end }}">
-  <div class="post-card-header">
-    <a href="{{ $post.Permalink }}" class="post-card-link">{{ $post.Title }}</a>
-    <div class="post-card-meta">
-      <time class="post-date" datetime="{{ $post.Date.Format "2006-01-02" }}">{{ $post.Date.Format "2006-01-02" }}</time>
-      <span class="meta-sep">&middot;</span>
-      <span class="reading-time">{{ $post.ReadingTime }} min read</span>
-    </div>
-  </div>
-  {{ if $post.Summary }}
-  <p class="post-card-excerpt">{{ $post.Summary | plainify | truncate 160 }}</p>
-  {{ end }}
-  {{ with $post.Params.tags }}
-  <div class="post-tags">
-    {{ range . }}
-    <a href="{{ "tags/" | absURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>
-    {{ end }}
-  </div>
-  {{ end }}
-</article>
+{{ partial "post-card.html" (dict "page" $post "featured" (eq $i 0)) }}
 {{ end }}
 
 <script>
@@ -49,6 +33,8 @@
     if (!el) return;
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    var text = el.querySelector('.intro-cycle-text');
+    if (!text) return;
     var phrases;
     try { phrases = JSON.parse(el.getAttribute('data-cycle')); }
     catch (e) { return; }
@@ -59,13 +45,24 @@
     for (var i = 1; i < phrases.length; i++) order.push(i);
     order.push(0);
 
-    var HOLD = 1600, FADE = 320, step = 0;
+    var HOLD = 1600, step = 0;
+    var FADE = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dur-base')) || 250;
 
     function tick() {
-      el.classList.add('is-swapping');
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        text.textContent = phrases[0];
+        text.classList.remove('is-swapping');
+        return;
+      }
+      text.classList.add('is-swapping');
       setTimeout(function () {
-        el.textContent = phrases[order[step]];
-        el.classList.remove('is-swapping');
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          text.textContent = phrases[0];
+          text.classList.remove('is-swapping');
+          return;
+        }
+        text.textContent = phrases[order[step]];
+        text.classList.remove('is-swapping');
         step++;
         if (step < order.length) setTimeout(tick, HOLD);
       }, FADE);

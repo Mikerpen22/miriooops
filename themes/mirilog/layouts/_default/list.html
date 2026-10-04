@@ -1,25 +1,10 @@
 {{ define "main" }}
 
-<p class="section-label">~/{{ .Title | lower }}</p>
+<h1 class="section-label">~/{{ .Title | lower }}</h1>
 
-{{ range .Pages }}
-<article class="post-card">
-  <div class="post-card-header">
-    <a href="{{ .Permalink }}" class="post-card-link">{{ .Title }}</a>
-    <div class="post-card-meta">
-      <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
-      <span class="meta-sep">&middot;</span>
-      <span class="reading-time">{{ .ReadingTime }} min read</span>
-    </div>
-  </div>
-  {{ with .Params.tags }}
-  <div class="post-tags">
-    {{ range . }}
-    <a href="{{ "tags/" | absURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>
-    {{ end }}
-  </div>
-  {{ end }}
-</article>
+{{ $paginator := .Paginate .Pages.ByDate.Reverse }}
+{{ range $paginator.Pages }}
+{{ partial "post-card.html" (dict "page" . "featured" false) }}
 {{ end }}
 
 {{ template "_internal/pagination.html" . }}

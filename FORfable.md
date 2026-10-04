@@ -48,10 +48,9 @@ carry a class, so they reference the same tokens by element selector.
   background mixed with transparency, so it adapts to light and dark for free.
 - **`backdrop-filter`**. The blur that makes glass read as glass. Wrapped in
   `@supports` so a browser without it gets a solid fill.
-- **Scroll-driven animations** (`animation-timeline: scroll()`). The header
-  morphs from a flat bar into a floating pill as a function of scroll
-  position, not time. Safari lacks it, so the older JavaScript `.scrolled`
-  class stays as the fallback and both paths land on the same final state.
+- **Stable header geometry**. JavaScript toggles `.scrolled` to change the
+  glass fill, border, and shadow. Its dimensions stay fixed while scrolling;
+  mobile uses two rows with 44px navigation controls.
 - **Cross-document view transitions** (`@view-transition`). One rule, and
   navigating between posts crossfades instead of flashing. Browsers that do
   not support it navigate normally.
@@ -84,33 +83,31 @@ surface reads as an outline instead of a highlight.
 rather than `.btn:hover` means leaving mid-animation reverses smoothly. This
 one change is most of what people mean by "fluid".
 
-**Spring easing only on small controls.** Overshoot on a 32px button feels
-alive. Overshoot on a 700px column looks like a wobble.
+**Shared timing for interactions.** Small controls use the 150ms token;
+colour changes and navigation crossfades use 250ms; content fades use 320ms.
+Reduced-motion preferences disable animations and smooth scrolling.
 
 **One scale per property.** Before the audit the sheet had fifteen font sizes,
 six tracking values, seven radii, and post titles at weight 400 next to
 featured cards at 600 and h1 at 700. Now there is one type scale, three
-weights, four tracking values, four radii, all tokens. The post title stays at
-400 on purpose: Instrument Serif italic only ships in that weight.
+weights, four tracking values, four radii, all tokens. Geist headings and
+article-card titles use 600, prose uses 400, and metadata and code use
+JetBrains Mono. Home and archive cards share one template.
 
 ## Lessons learned
 
-**The `animation` shorthand resets `animation-timeline`.** If you write the
-shorthand and then set the timeline, the order matters: timeline must come
-after the shorthand or it silently reverts to `auto`, and the header morph
-would just not run. `motion.css` sets the timeline after the shorthand for
-this reason; keep that order if you ever touch it.
+**Reserve space for rotating text.** The home introduction measures every
+phrase in an invisible grid layer so changing its text cannot move the post
+list below it. Reduced motion keeps the first phrase visible.
 
-**Reduced motion needs a separate rule for scroll timelines.** The usual trick
-of forcing `animation-duration` to near zero does nothing to a scroll-driven
-animation because duration is not a concept there. It needs `animation: none`
-explicitly, at which point the JavaScript fallback takes over.
+**Keep reveal timing in CSS.** JavaScript only toggles reveal classes and a
+bounded delay. No-JavaScript and reduced-motion visitors see every card,
+and changing the motion preference clears pending reveals immediately.
 
-**Animations win the cascade.** While a fill-mode `both` animation is active,
-its values beat ordinary declarations. That is why the `.scrolled` class is
-harmless in browsers that support scroll timelines: the animation simply
-overrides it. Useful when you want a progressive enhancement layered over a
-fallback without `@supports` gymnastics around every property.
+**Sort explicitly when chronology matters.** Hugo's default ordering uses
+front-matter weights before dates. Home, archive, taxonomy, RSS, and LLM
+indexes explicitly use date descending so older weighted posts cannot bury
+new articles.
 
 **Bind the dev server to the host you will test against.** Hugo rewrote asset
 URLs to `localhost` while the test browser opened `127.0.0.1`, and the
@@ -121,7 +118,8 @@ inconsistencies underneath, and fixing those did more for how the site feels
 than the blur did. Good engineers look at the tally of values first; the
 `grep | sort | uniq -c` pattern on a stylesheet is a cheap x-ray.
 
-**Do not trust "it looks fine" from one viewport.** The pill header was checked
-at desktop and phone width, in both colour schemes, at top and scrolled, and
-with reduced motion emulated. Each of those caught nothing this time, and that
-is the point: the check is cheap and the alternative is a user finding it.
+**Do not trust "it looks fine" from one viewport.** The responsive layout was checked
+from 320px to 1440px, in both colour schemes, at top and scrolled, with
+reduced motion, storage blocked, and JavaScript disabled. Check interaction
+behaviour as well as screenshots: focus, clipboard, overflow, and sorting
+all affect whether the site is usable.

@@ -1,0 +1,19 @@
+{{ $page := .page }}
+<article class="post-card{{ if .featured }} post-card--featured{{ end }}">
+  <div class="post-card-header">
+    <h2 class="post-card-title"><a href="{{ $page.Permalink }}" class="post-card-link">{{ $page.Title }}</a></h2>
+    <div class="post-card-meta">
+      <time class="post-date" datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "2006-01-02" }}</time>
+      <span class="meta-sep" aria-hidden="true">&middot;</span>
+      <span class="reading-time">{{ $page.ReadingTime }} min read</span>
+    </div>
+  </div>
+  {{ with or $page.Description $page.Summary }}
+  <p class="post-card-excerpt">{{ . | plainify | truncate 180 }}</p>
+  {{ end }}
+  {{ with $page.Params.tags }}
+  <div class="post-tags">
+    {{ range . }}<a href="{{ "tags/" | absURL }}{{ . | urlize }}/" class="tag">{{ . }}</a>{{ end }}
+  </div>
+  {{ end }}
+</article>

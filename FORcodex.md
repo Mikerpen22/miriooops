@@ -77,7 +77,7 @@ Go templates generate the HTML. Hugo Pipes minifies and fingerprints the theme s
 
 ### Plain CSS and JavaScript
 
-The site deliberately avoids a front-end framework. Its interactions are small enough that plain JavaScript is easier to understand and cheaper to ship. CSS custom properties define the light and dark palettes, with Ubuntu orange as the only accent hue. Geist is used for prose, JetBrains Mono for interface metadata and code, and Instrument Serif is available for selected display treatment.
+The site deliberately avoids a front-end framework. Its interactions are small enough that plain JavaScript is easier to understand and cheaper to ship. CSS custom properties define the light and dark palettes, with Ubuntu orange as the only accent hue. Geist is used for prose and headings, with weight 600 for headings and article-card titles. JetBrains Mono is reserved for interface metadata and code. Shared spacing, typography, and motion tokens keep home, archives, and articles consistent.
 
 ### Netlify
 

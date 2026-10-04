@@ -1,132 +1,23 @@
-/* ══════════════════════════════════════════════
-   Motion — entrance, header morph, page transitions
-   ══════════════════════════════════════════════ */
-
-/* ── Entrance ────────────────────────────────── */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Motion uses shared timings and never changes header geometry. */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.site-header, .post-header, .not-found { animation: fadeIn var(--dur-slow) var(--ease-out) both; }
+.intro { animation: fadeIn var(--dur-slow) var(--ease-out) 80ms both; }
+.section-label, .post-content { animation: fadeIn var(--dur-slow) var(--ease-out) 120ms both; }
 .site-header {
-  animation: fadeUp var(--dur-slow) var(--ease-out) both;
-}
-
-.intro {
-  animation: fadeUp var(--dur-slow) var(--ease-out) 80ms both;
-}
-
-.section-label {
-  animation: fadeUp var(--dur-slow) var(--ease-out) 140ms both;
-}
-
-.post-header {
-  animation: fadeUp var(--dur-slow) var(--ease-out) both;
-}
-
-.post-content {
-  animation: fadeUp var(--dur-slow) var(--ease-out) 120ms both;
-}
-
-/* ── Header morph: flat bar → floating pill ──── */
-/* Fallback path: JS toggles .scrolled at 20px, transitions interpolate. */
-.site-header {
-  transition:
-    background var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out),
-    border-radius var(--dur-base) var(--ease-out),
-    padding var(--dur-base) var(--ease-out),
-    margin var(--dur-base) var(--ease-out),
-    top var(--dur-base) var(--ease-out);
-}
-
-/* Enhanced path: geometry tracks scroll position continuously. */
-@keyframes headerMorph {
-  /* Vertical padding and margin stay constant so the header never changes
-     height mid-scroll; only horizontal inset, radius and paint interpolate. */
-  from {
-    top: 2px;
-    margin: var(--sp-sm) 0;
-    padding: var(--sp-sm) 0;
-    border-radius: 0;
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-  }
-  to {
-    top: var(--header-float-top);
-    margin: var(--sp-sm) var(--header-float-inset);
-    padding: var(--sp-sm) var(--sp-md);
-    border-radius: var(--surface-radius-pill);
-    border-color: var(--surface-border);
-    background: var(--surface-floating-fill);
-    box-shadow:
-      inset 0 1px 0 var(--glass-edge),
-      inset 0 -1px 0 var(--glass-edge-bottom),
-      var(--glass-shadow-floating);
-  }
-}
-
-@supports (animation-timeline: scroll()) {
-  .site-header {
-    /* Animation values beat the .scrolled rule in the cascade, so the JS
-       fallback is harmless here; both paths end at the same state. */
-    animation:
-      fadeUp var(--dur-slow) var(--ease-out) both,
-      headerMorph auto linear both;
-    animation-timeline: auto, scroll(root);
-    animation-range: normal, 0 var(--header-morph-distance);
-    transition: none;
-  }
-}
-
-/* ── Cross-document page transitions ─────────── */
-/* The @view-transition opt-in lives inline in partials/head.html:
-   the minifier drops unknown at-rules from bundled CSS. */
-
-.site-header {
+  transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
   view-transition-name: site-header;
 }
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: var(--dur-base);
-  animation-timing-function: var(--ease-out);
+.post-card, .tag-card {
+  transition: background-color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), opacity var(--dur-slow) var(--ease-out);
+  transition-delay: 0ms, 0ms, var(--reveal-delay, 0ms);
 }
-
-/* The crossfade already moves these; a second fadeUp would double the motion */
-html:active-view-transition .intro,
-html:active-view-transition .section-label,
-html:active-view-transition .post-header,
-html:active-view-transition .post-content {
-  animation: none;
-}
-
-/* ── Reduced motion ──────────────────────────── */
+.reveal-pending { opacity: 0; }
+/* Navigation opt-in lives inline because Hugo's minifier strips the at-rule. */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--dur-base); animation-timing-function: var(--ease-out); }
+html:active-view-transition .intro, html:active-view-transition .section-label,
+html:active-view-transition .post-header, html:active-view-transition .post-content { animation: none; }
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  /* Scroll timelines ignore duration; drop the morph so .scrolled snaps. */
-  .site-header {
-    animation: none;
-  }
-
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .reveal-pending, .intro-cycle-text.is-swapping { opacity: 1; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }

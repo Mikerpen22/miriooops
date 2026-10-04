@@ -4,25 +4,49 @@
   {{ partial "head.html" . }}
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <div class="site">
     {{ partial "header.html" . }}
-    <main class="site-content">
+    <main class="site-content" id="main-content" tabindex="-1">
       {{ block "main" . }}{{ end }}
     </main>
     {{ partial "footer.html" . }}
   </div>
   <script>
   (function(){
+    var motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     // Theme toggle
     var btn = document.querySelector('.theme-toggle');
     if (btn) {
+      function updateThemeLabel() {
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+        btn.setAttribute('aria-pressed', String(dark));
+      }
+      updateThemeLabel();
       btn.addEventListener('click', function(){
         var current = document.documentElement.getAttribute('data-theme');
         var next = current === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+        updateThemeLabel();
       });
     }
+
+    var backToTop = document.querySelector('.back-to-top');
+    if (backToTop) backToTop.addEventListener('click', function() {
+      window.scrollTo({ top: 0, behavior: motion.matches ? 'auto' : 'smooth' });
+    });
+
+    document.querySelectorAll('.post-content table').forEach(function(table, index) {
+      var wrap = document.createElement('div');
+      wrap.className = 'table-scroll';
+      wrap.setAttribute('role', 'region');
+      wrap.setAttribute('aria-label', 'Table ' + (index + 1) + ', scroll horizontally if needed');
+      wrap.setAttribute('tabindex', '0');
+      table.parentNode.insertBefore(wrap, table);
+      wrap.appendChild(table);
+    });
 
     // Sticky header scroll detection
     var header = document.getElementById('site-header');
@@ -61,8 +85,18 @@
       copyBtn.className = 'code-copy';
       copyBtn.textContent = 'copy';
       copyBtn.setAttribute('aria-label', 'Copy code');
+      copyBtn.setAttribute('aria-live', 'polite');
       copyBtn.addEventListener('click', function() {
         var text = code ? code.textContent : pre.textContent;
+        function selectCode() {
+          var range = document.createRange();
+          range.selectNodeContents(code || pre);
+          var selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          copyBtn.textContent = 'selected';
+        }
+        if (!navigator.clipboard) { selectCode(); return; }
         navigator.clipboard.writeText(text).then(function() {
           copyBtn.textContent = 'copied!';
           copyBtn.classList.add('copied');
@@ -70,7 +104,7 @@
             copyBtn.textContent = 'copy';
             copyBtn.classList.remove('copied');
           }, 2000);
-        });
+        }).catch(selectCode);
       });
       hdr.appendChild(copyBtn);
       block.insertBefore(hdr, pre);
@@ -78,25 +112,27 @@
 
     // Scroll-triggered fade-in for cards
     var fadeEls = document.querySelectorAll('.post-card, .tag-card');
-    if (fadeEls.length && 'IntersectionObserver' in window) {
-      fadeEls.forEach(function(el) {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(12px)';
-      });
+    if (fadeEls.length && 'IntersectionObserver' in window && !motion.matches) {
+      fadeEls.forEach(function(el) { el.classList.add('reveal-pending'); });
       var fadeObserver = new IntersectionObserver(function(entries) {
+        var visibleIndex = 0;
         entries.forEach(function(entry) {
           if (entry.isIntersecting) {
             var el = entry.target;
-            var idx = Array.prototype.indexOf.call(fadeEls, el);
-            var delay = idx * 50;
-            el.style.transition = 'opacity 500ms cubic-bezier(0.22,1,0.36,1) ' + delay + 'ms, transform 500ms cubic-bezier(0.22,1,0.36,1) ' + delay + 'ms';
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
+            el.style.setProperty('--reveal-delay', Math.min(visibleIndex++ * 40, 120) + 'ms');
+            el.classList.remove('reveal-pending');
             fadeObserver.unobserve(el);
           }
         });
-      }, { threshold: 0.1 });
+      }, { threshold: 0.05 });
       fadeEls.forEach(function(el) { fadeObserver.observe(el); });
+      function revealForReducedMotion() {
+        if (!motion.matches) return;
+        fadeObserver.disconnect();
+        fadeEls.forEach(function(el) { el.classList.remove('reveal-pending'); });
+      }
+      if (motion.addEventListener) motion.addEventListener('change', revealForReducedMotion);
+      else if (motion.addListener) motion.addListener(revealForReducedMotion);
     }
   })();
   </script>

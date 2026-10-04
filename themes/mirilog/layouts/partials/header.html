@@ -1,9 +1,9 @@
 <header class="site-header" id="site-header">
   <a href="{{ "/" | relURL }}" class="site-name"><span class="prompt">&gt;</span> {{ .Site.Params.siteName | default .Site.Title }}</a>
   <div class="header-right">
-    <nav class="site-nav">
+    <nav class="site-nav" aria-label="Main navigation">
       {{ range .Site.Menus.main }}
-        <a href="{{ .URL | relURL }}"{{ if $.IsMenuCurrent "main" . }} aria-current="page"{{ end }}>{{ .Name | lower }}</a>
+        <a href="{{ .URL | relURL }}"{{ if or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) (and (eq .Identifier "posts") (eq $.Section "posts")) }} aria-current="page"{{ end }}>{{ .Name | lower }}</a>
       {{ end }}
     </nav>
     <a class="github-link surface--raised surface--quiet" href="https://github.com/Mikerpen22" rel="me noopener noreferrer" target="_blank" aria-label="Visit Michael Shih on GitHub (opens in a new tab)" title="GitHub">

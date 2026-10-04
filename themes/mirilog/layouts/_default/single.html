@@ -3,19 +3,20 @@
 <article class="post">
   <header class="post-header">
     <h1 class="post-title">{{ .Title }}</h1>
+    {{ if eq .Section "posts" }}
     <div class="post-meta">
       <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006-01-02" }}</time>
       <span class="meta-sep">&middot;</span>
       <span>{{ .ReadingTime }} min read</span>
-      {{ with .Params.lastmod }}
+      {{ if ne (.Lastmod.Format "2006-01-02") (.Date.Format "2006-01-02") }}
       <span class="meta-sep">&middot;</span>
-      <span class="meta-updated">updated {{ . | time.Format "2006-01-02" }}</span>
+      <span class="meta-updated">updated {{ .Lastmod.Format "2006-01-02" }}</span>
       {{ end }}
       {{ with .Params.tags }}
-      <span class="meta-sep">&middot;</span>
       <span class="meta-tags">{{ range $i, $t := . }}{{ if $i }} {{ end }}#{{ $t }}{{ end }}</span>
       {{ end }}
     </div>
+    {{ end }}
   </header>
 
   {{/* Table of Contents — only render if there are headings */}}
@@ -23,7 +24,7 @@
   {{ if and $toc (gt (len $toc) 100) }}
   <aside class="toc-sidebar" id="toc">
     <div class="toc-progress" aria-hidden="true"></div>
-    <nav class="toc-nav">
+    <nav class="toc-nav" aria-label="On this page">
       <p class="toc-title">on this page</p>
       {{ $toc }}
     </nav>

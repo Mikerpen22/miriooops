@@ -14,6 +14,6 @@
 - [Full content for LLMs]({{ "llms-full.txt" | absURL }})
 
 ## Posts
-{{ range where .Site.RegularPages "Section" "posts" }}
+{{ range (where .Site.RegularPages "Section" "posts").ByDate.Reverse }}
 - [{{ .Title }}]({{ .Permalink }}): {{ .Date.Format "2006-01-02" }}{{ with .Params.tags }} | Tags: {{ delimit . ", " }}{{ end }}
 {{- end }}
